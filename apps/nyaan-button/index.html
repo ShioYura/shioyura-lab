@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>にゃーんボタン</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app" aria-labelledby="appTitle">
+    <section class="panel">
+      <div class="cat-face" aria-hidden="true">
+        <span class="ear ear-left"></span>
+        <span class="ear ear-right"></span>
+        <span class="eye eye-left"></span>
+        <span class="eye eye-right"></span>
+        <span class="mouth"></span>
+      </div>
+
+      <h1 id="appTitle">にゃーんボタン</h1>
+      <button id="nyaanButton" class="nyaan-button" type="button">
+        にゃーん
+      </button>
+
+      <p id="message" class="message" aria-live="polite">ボタンを押してね</p>
+      <p class="counter">押した回数 <span id="count">0</span></p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
