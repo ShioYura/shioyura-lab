@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スマホdeOCR</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app" aria-labelledby="appTitle">
+    <header class="hero">
+      <div class="eyebrow">ShioYura Lab OCR</div>
+      <h1 id="appTitle">スマホdeOCR</h1>
+      <p>撮る → 読む → コピー</p>
+    </header>
+
+    <section class="panel input-panel">
+      <h2>画像を読み込む</h2>
+      <label class="file-box" for="imageInput">
+        <span class="file-title">カメラで撮影 / 画像を選択</span>
+        <span id="fileName" class="file-name">書類・メモ・ホワイトボードの画像を選んでください</span>
+      </label>
+      <input id="imageInput" type="file" accept="image/*" capture="environment">
+
+      <div class="button-row">
+        <button id="ocrButton" type="button" disabled>OCRを実行</button>
+        <button id="clearButton" class="ghost-button" type="button">クリア</button>
+      </div>
+
+      <div class="progress-wrap" aria-label="OCR進捗">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <p id="statusText" class="status" aria-live="polite">画像を選択するとOCRを実行できます。</p>
+    </section>
+
+    <section class="preview-grid">
+      <section class="panel preview-panel" aria-labelledby="previewTitle">
+        <h2 id="previewTitle">画像プレビュー</h2>
+        <div id="previewPlaceholder" class="placeholder">まだ画像がありません</div>
+        <img id="previewImage" class="preview-image" alt="選択した画像のプレビュー">
+      </section>
+
+      <section class="panel result-panel" aria-labelledby="resultTitle">
+        <div class="section-heading">
+          <h2 id="resultTitle">抽出テキスト</h2>
+          <button id="copyButton" class="copy-button" type="button">コピー</button>
+        </div>
+        <textarea id="resultText" placeholder="OCR結果がここに表示されます。抽出後に編集できます。"></textarea>
+        <p id="copyMessage" class="copy-message" aria-live="polite"></p>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

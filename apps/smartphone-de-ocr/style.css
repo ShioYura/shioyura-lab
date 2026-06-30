@@ -1,0 +1,266 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  background:
+    linear-gradient(90deg, rgba(225, 241, 255, 0.72) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 232, 240, 0.72) 1px, transparent 1px),
+    linear-gradient(135deg, #f8fcff 0%, #fff9fc 100%);
+  background-size: 32px 32px, 32px 32px, auto;
+  color: #27313b;
+}
+
+.app {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  padding: 26px 18px 36px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  display: inline-grid;
+  min-height: 30px;
+  place-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #e7f4ff;
+  color: #286494;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin: 12px 0 8px;
+  font-size: 34px;
+  line-height: 1.25;
+}
+
+.hero p {
+  margin-bottom: 0;
+  color: #c84273;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.panel {
+  border: 1px solid #dce6ef;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 30px rgba(60, 72, 88, 0.1);
+}
+
+.input-panel {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 18px;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: 22px;
+}
+
+#imageInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.file-box {
+  display: grid;
+  gap: 8px;
+  min-height: 116px;
+  align-content: center;
+  padding: 18px;
+  border: 2px dashed #9ed4f5;
+  border-radius: 8px;
+  background: #f5fbff;
+  cursor: pointer;
+}
+
+.file-title {
+  color: #286494;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.file-name {
+  color: #657586;
+  line-height: 1.6;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+button {
+  min-height: 52px;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#ocrButton,
+.copy-button {
+  border: 0;
+  background: #2f7d68;
+  color: #ffffff;
+}
+
+#ocrButton:disabled,
+.copy-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.ghost-button {
+  min-width: 96px;
+  border: 1px solid #cfd9e4;
+  background: #ffffff;
+  color: #4f5f6d;
+}
+
+.progress-wrap {
+  width: 100%;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf3f8;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #9ed4f5 0%, #ffb8d0 100%);
+  transition: width 180ms ease;
+}
+
+.status,
+.copy-message {
+  min-height: 24px;
+  margin-bottom: 0;
+  color: #657586;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+}
+
+.preview-panel,
+.result-panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.placeholder {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+  border-radius: 8px;
+  background: #f8fbfd;
+  color: #7a8a99;
+  font-weight: 700;
+}
+
+.preview-image {
+  display: none;
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  border: 1px solid #e2eaf1;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.section-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copy-button {
+  min-width: 104px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 360px;
+  padding: 14px;
+  border: 1px solid #ccd8e3;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #27313b;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+textarea:focus {
+  border-color: #4d91ca;
+  outline: 4px solid #dcefff;
+}
+
+@media (max-width: 780px) {
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding: 20px 14px 28px;
+  }
+
+  h1 {
+    font-size: 30px;
+  }
+
+  .button-row,
+  .section-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .button-row {
+    display: grid;
+  }
+
+  .ghost-button,
+  .copy-button {
+    width: 100%;
+  }
+
+  .placeholder {
+    min-height: 220px;
+  }
+
+  textarea {
+    min-height: 300px;
+  }
+}
