@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>かご台車管理ダッシュボード</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="container-fluid py-3 px-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+          <div class="app-title">かご台車管理ダッシュボード</div>
+          <div class="app-subtitle">朝の要対応確認・拠点別状況・棚卸確認</div>
+        </div>
+        <div class="updated-at" id="screenUpdatedAt"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-fluid px-4 py-4">
+    <nav class="view-tabs mb-3" aria-label="画面切替">
+      <button class="view-tab is-active" type="button" data-tab-target="dashboardPanel">ダッシュボード</button>
+      <button class="view-tab" type="button" data-tab-target="inventoryPanel">棚卸確認</button>
+    </nav>
+
+    <section id="dashboardPanel" class="tab-panel is-active">
+      <section class="section-card priority-card mb-3">
+        <div class="section-title">
+          <span>要対応</span>
+          <small>画面を開いたら最初に確認</small>
+        </div>
+        <div class="p-3">
+          <div class="action-grid" id="actionSummary"></div>
+        </div>
+      </section>
+
+      <section class="section-card mb-3">
+        <div class="section-title">
+          <span>拠点別 保有台数</span>
+          <small>詳細は各カード内で展開</small>
+        </div>
+        <div class="p-3">
+          <div class="location-grid" id="locationSummary"></div>
+        </div>
+      </section>
+
+      <div class="row g-3 mb-3">
+        <div class="col-xl-6">
+          <section class="section-card h-100">
+            <div class="section-title">
+              <span>長期間未更新のかご車一覧</span>
+              <small>30日以上: 注意、60日以上: 警戒、90日以上: 危険</small>
+            </div>
+            <div class="table-wrap table-wrap-stale">
+              <table class="table table-sm table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>かご車番号</th>
+                    <th>現在地</th>
+                    <th>最終更新日時</th>
+                    <th>状態</th>
+                    <th>判定</th>
+                    <th class="text-end">経過日数</th>
+                  </tr>
+                </thead>
+                <tbody id="staleCartTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="col-xl-6">
+          <section class="section-card h-100">
+            <div class="section-title">
+              <span>最新履歴一覧</span>
+              <small>直近の流れを確認</small>
+            </div>
+            <div class="table-wrap history-scroll">
+              <table class="table table-sm table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>日時</th>
+                    <th>処理区分</th>
+                    <th>かご車番号</th>
+                    <th>出庫元</th>
+                    <th>入庫先</th>
+                    <th>ユーザー</th>
+                    <th>備考</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <section class="section-card">
+        <div class="section-title">
+          <span>補助情報</span>
+          <small>必要なときだけ開く</small>
+        </div>
+        <div class="accordion-stack">
+          <details>
+            <summary>全体サマリー</summary>
+            <div class="metric-grid mt-3" id="overallSummary"></div>
+          </details>
+          <details>
+            <summary>状態別集計</summary>
+            <div class="metric-grid mt-3" id="statusSummary"></div>
+          </details>
+          <details>
+            <summary>拠点間移動ランキング</summary>
+            <div class="ranking-list mt-3" id="routeRanking"></div>
+          </details>
+          <details>
+            <summary>状態・判定条件の説明</summary>
+            <div class="definition-list mt-3">
+              <div><strong>移動中:</strong> 出庫処理後、入庫先での入庫または棚卸確認が完了していない状態です。</div>
+              <div><strong>長期未更新:</strong> 画面基準日から最終更新日時までの経過日数が30日以上のかご車です。60日以上を警戒、90日以上を危険として表示します。</div>
+              <div><strong>画面基準日:</strong> この試作ではサンプル集計の基準として固定した日時です。実運用ではサーバー時刻またはバッチ基準日時に置き換えます。</div>
+            </div>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <section id="inventoryPanel" class="tab-panel">
+      <section class="section-card">
+        <div class="section-title">
+          <span>棚卸確認</span>
+          <small>拠点を選んで現物確認</small>
+        </div>
+        <div class="inventory-toolbar">
+          <div class="d-flex align-items-center gap-2">
+            <label for="inventoryLocation" class="form-label mb-0 fw-semibold">拠点</label>
+            <select class="form-select form-select-sm" id="inventoryLocation"></select>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <div class="counter-pill">チェック済み <span id="checkedCount">0</span> 件</div>
+            <div class="counter-pill">未チェック <span id="uncheckedCount">0</span> 件</div>
+          </div>
+        </div>
+        <div class="table-wrap inventory-scroll">
+          <table class="table table-sm table-hover align-middle">
+            <thead>
+              <tr>
+                <th style="width: 42px;">確認</th>
+                <th>かご車番号</th>
+                <th>現在地</th>
+                <th>状態</th>
+                <th>最終更新日時</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
