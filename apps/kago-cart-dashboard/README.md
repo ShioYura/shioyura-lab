@@ -2,6 +2,7 @@
 
 物流向け「かご台車管理システム」の画面モックです。
 Python、Flask、DBは使わず、HTML/CSS/JavaScriptだけで動作します。
+現在のデザインは、近未来SF映画に登場する宇宙港の貨物管理端末をイメージしたFuturistic HUDテーマです。
 
 ## 起動方法
 
@@ -34,6 +35,7 @@ Start-Process C:\CodexLab\apps\kago-cart-dashboard\index.html
 
 - `index.html` は画面構造を定義しています。
 - `style.css` は業務画面向けの見た目を定義しています。
+- 黒背景、シアンブルーのHUD表現、半透明パネル、スキャンライン、レーダー風装飾は `style.css` に集約しています。
 - `app.js` はデータ定義、集計処理、描画処理、イベント処理を定義しています。
 - サンプルデータは `app.js` 内の `carts` と `histories` に定義しています。
 - 集計処理は `buildOverallSummary`、`buildActionSummary`、`buildLocationSummary`、`buildStatusSummary`、`buildRouteRanking`、`getStaleCarts` に分けています。
