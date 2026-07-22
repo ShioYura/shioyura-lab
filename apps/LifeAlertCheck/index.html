@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LIFE ALERT CHECK</title>
+<style>
+  :root{
+    --green:#3FBF7F;
+    --green-bg:#E6F8EE;
+    --yellow:#F2B705;
+    --yellow-bg:#FFF6DD;
+    --red:#F0554A;
+    --red-bg:#FFEAE8;
+    --ink:#2E2A2C;
+    --sub:#8A8388;
+    --card-bg:#FFFFFF;
+    --page-bg:#FBF9F6;
+    --line:#EFEAE4;
+    --accent:#8E7CF0;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--page-bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 28px 18px 60px;
+  }
+
+  header{
+    text-align:center;
+    padding: 10px 0 22px;
+  }
+
+  header .badge{
+    display:inline-block;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: #F1EDFE;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  h1{
+    font-size: 26px;
+    letter-spacing: 0.02em;
+    margin: 0 0 6px;
+    font-weight: 800;
+  }
+
+  h1 .emoji{ margin-right:4px; }
+
+  .subtitle{
+    font-size: 14px;
+    color: var(--sub);
+    margin: 0;
+  }
+
+  .card{
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(46,42,44,0.05);
+    border: 1px solid var(--line);
+  }
+
+  .card-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .card-title .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--accent);
+    flex-shrink:0;
+  }
+
+  .check-item{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding: 12px 8px;
+    border-radius: 14px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .check-item:active{
+    background: #F6F4FF;
+    transform: scale(0.99);
+  }
+
+  .check-item + .check-item{
+    border-top: 1px solid var(--line);
+  }
+
+  .check-item input[type="checkbox"]{
+    appearance:none;
+    -webkit-appearance:none;
+    width: 26px;
+    height: 26px;
+    min-width:26px;
+    border-radius: 8px;
+    border: 2px solid #D8D2CC;
+    background: #fff;
+    position:relative;
+    cursor:pointer;
+    transition: all 0.15s ease;
+    margin-top:1px;
+  }
+
+  .check-item input[type="checkbox"]:checked{
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .check-item input[type="checkbox"]:checked::after{
+    content:"";
+    position:absolute;
+    left:8px; top:3px;
+    width:6px; height:12px;
+    border:solid white;
+    border-width:0 2px 2px 0;
+    transform:rotate(40deg);
+  }
+
+  .check-item label{
+    font-size: 15px;
+    line-height: 1.45;
+    padding-top: 2px;
+    cursor:pointer;
+    flex:1;
+  }
+
+  .btn-row{
+    display:flex;
+    gap:10px;
+    margin: 22px 0 8px;
+  }
+
+  .btn{
+    border:none;
+    border-radius: 16px;
+    padding: 16px 18px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor:pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+
+  .btn:active{
+    transform: scale(0.97);
+  }
+
+  .btn-primary{
+    flex:1;
+    background: linear-gradient(135deg, var(--accent), #7364E0);
+    color:#fff;
+    box-shadow: 0 6px 16px rgba(142,124,240,0.35);
+    font-size: 18px;
+    padding: 18px;
+  }
+
+  .btn-secondary{
+    flex:1;
+    background: #F1EFEA;
+    color: var(--ink);
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  #resultCard{
+    display:none;
+    text-align:center;
+    padding: 26px 16px;
+  }
+
+  #resultCard.show{ display:block; }
+
+  #resultCard .count{
+    font-size: 13px;
+    color: var(--sub);
+    margin-bottom: 6px;
+    font-weight:600;
+  }
+
+  #resultCard .title{
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    margin: 4px 0 10px;
+  }
+
+  #resultCard .message{
+    font-size: 15px;
+    line-height: 1.6;
+    margin:0;
+    font-weight:500;
+  }
+
+  .result-green{ background: var(--green-bg); }
+  .result-green .title{ color: var(--green); }
+
+  .result-yellow{ background: var(--yellow-bg); }
+  .result-yellow .title{ color: #C99000; }
+
+  .result-red{ background: var(--red-bg); }
+  .result-red .title{ color: var(--red); }
+
+  .section-label{
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--sub);
+    letter-spacing: 0.08em;
+    margin: 30px 4px 10px;
+  }
+
+  .history-row{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom: 4px;
+  }
+
+  .history-item{
+    flex: 1 0 auto;
+    min-width: 58px;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 6px;
+    text-align:center;
+  }
+
+  .history-item .d{
+    font-size: 11px;
+    color: var(--sub);
+    margin-bottom: 4px;
+    font-weight:600;
+  }
+
+  .history-item .v{
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .history-item.today{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .streak-msg{
+    margin-top: 12px;
+    background: #F1EDFE;
+    color: #5A4BC4;
+    font-size: 13.5px;
+    line-height:1.5;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight:600;
+  }
+
+  .footer-actions{
+    display:flex;
+    justify-content:center;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .link-btn{
+    background:none;
+    border:none;
+    color: var(--sub);
+    font-size: 12.5px;
+    text-decoration: underline;
+    cursor:pointer;
+    padding: 6px;
+  }
+
+  .storage-warning{
+    display:none;
+    background:#FFF6DD;
+    color:#9A7300;
+    font-size: 12.5px;
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:16px;
+    text-align:center;
+  }
+
+  .storage-warning.show{ display:block; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="badge">SELF CHECK</div>
+    <h1><span class="emoji">🎮</span>LIFE ALERT CHECK</h1>
+    <p class="subtitle">夢中になりすぎてない？</p>
+  </header>
+
+  <div id="storageWarning" class="storage-warning">
+    ⚠️ この端末では履歴の保存ができません。診断自体は通常通り使えます。
+  </div>
+
+  <div id="checklistArea"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="diagnoseBtn">✅ 診断する</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" id="clearChecksBtn">🔄 チェックをクリア</button>
+  </div>
+
+  <div class="card" id="resultCard">
+    <div class="count" id="resultCount">アラート 0 件</div>
+    <div class="title" id="resultTitle">ALL GREEN！</div>
+    <p class="message" id="resultMessage"></p>
+  </div>
+
+  <div class="section-label">📅 過去7日間のログ</div>
+  <div class="history-row" id="historyRow"></div>
+  <div class="streak-msg" id="streakMsg" style="display:none;"></div>
+
+  <div class="footer-actions">
+    <button class="link-btn" id="resetHistoryBtn">履歴を削除</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     設定エリア：ここを変更すればチェック項目・判定基準を調整できる
+     ============================================================ */
+
+  // チェック項目（カテゴリごとの配列で管理）
+  const CHECK_CATEGORIES = [
+    {
+      key: "money",
+      title: "💰 MONEY",
+      items: [
+        { id: "money_1", label: "今の日経平均がいくらか分からない" },
+        { id: "money_2", label: "自分の総資産額を把握していない" }
+      ]
+    },
+    {
+      key: "home",
+      title: "🏠 HOME",
+      items: [
+        { id: "home_1", label: "冷蔵庫の中身を把握していない" },
+        { id: "home_2", label: "賞味期限切れ、または期限間近の食品がある" },
+        { id: "home_3", label: "洗濯物かごが7割以上たまっている" },
+        { id: "home_4", label: "シンクに水へ浸けたままの食器がある" },
+        { id: "home_5", label: "ベランダのドアが開けにくい" },
+        { id: "home_6", label: "デスクや床に物が増えている" }
+      ]
+    },
+    {
+      key: "body",
+      title: "🧍 BODY",
+      items: [
+        { id: "body_1", label: "昨日の睡眠時間が6時間未満" },
+        { id: "body_2", label: "お肌が乾燥している" },
+        { id: "body_3", label: "スカートや服のウエストがきつい" }
+      ]
+    },
+    {
+      key: "mind",
+      title: "🧠 MIND",
+      items: [
+        { id: "mind_1", label: "昨日の手帳メモがない" },
+        { id: "mind_2", label: "今日やることを把握していない" }
+      ]
+    }
+  ];
+
+  // 判定基準（アラート数のしきい値）
+  const JUDGE_LEVELS = {
+    green:  { min: 0, max: 2, color: "green",  emoji: "🟢", title: "ALL GREEN！",
+              message: "生活基盤は保たれています。今日も好きなことに夢中になってOK！" },
+    yellow: { min: 3, max: 4, color: "yellow", emoji: "🟡", title: "YELLOW ALERT",
+              message: "ちょっと何かに夢中すぎない？ 今日ひとつだけ生活を整えよう。" },
+    red:    { min: 5, max: Infinity, color: "red", emoji: "🔴", title: "RED ALERT",
+              message: "合宿にはまり過ぎ！ 今日は生活の立て直しを優先しよう。" }
+  };
+
+  const STORAGE_KEY = "lifeAlertCheck_history_v1";
+  const MAX_HISTORY_DAYS = 7;
+
+  /* ============================================================
+     LocalStorage が使えない環境でも壊れないようにするラッパー
+     ============================================================ */
+  const safeStorage = {
+    isAvailable: (function(){
+      try{
+        const testKey = "__life_alert_test__";
+        window.localStorage.setItem(testKey, "1");
+        window.localStorage.removeItem(testKey);
+        return true;
+      }catch(e){
+        return false;
+      }
+    })(),
+    get(key){
+      if(!this.isAvailable) return null;
+      try{ return window.localStorage.getItem(key); }
+      catch(e){ return null; }
+    },
+    set(key, value){
+      if(!this.isAvailable) return false;
+      try{ window.localStorage.setItem(key, value); return true; }
+      catch(e){ return false; }
+    },
+    remove(key){
+      if(!this.isAvailable) return false;
+      try{ window.localStorage.removeItem(key); return true; }
+      catch(e){ return false; }
+    }
+  };
+
+  /* ============================================================
+     日付ユーティリティ（YYYY-MM-DD 形式で統一）
+     ============================================================ */
+  function formatDateKey(date){
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatDateLabel(date){
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    return `${m}/${d}`;
+  }
+
+  function getTodayKey(){
+    return formatDateKey(new Date());
+  }
+
+  /* ============================================================
+     チェックリストの描画
+     ============================================================ */
+  function renderChecklist(){
+    const area = document.getElementById("checklistArea");
+    let html = "";
+
+    CHECK_CATEGORIES.forEach(category => {
+      html += `<div class="card">`;
+      html += `<div class="card-title"><span class="dot"></span>${category.title}</div>`;
+      category.items.forEach(item => {
+        html += `
+          <div class="check-item">
+            <input type="checkbox" id="${item.id}">
+            <label for="${item.id}">${item.label}</label>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    });
+
+    area.innerHTML = html;
+  }
+
+  /* ============================================================
+     アラート数の集計
+     ============================================================ */
+  function countAlerts(){
+    let count = 0;
+    CHECK_CATEGORIES.forEach(category => {
+      category.items.forEach(item => {
+        const el = document.getElementById(item.id);
+        if(el && el.checked) count++;
+      });
+    });
+    return count;
+  }
+
+  function judgeLevel(count){
+    if(count >= JUDGE_LEVELS.red.min) return JUDGE_LEVELS.red;
+    if(count >= JUDGE_LEVELS.yellow.min) return JUDGE_LEVELS.yellow;
+    return JUDGE_LEVELS.green;
+  }
+
+  /* ============================================================
+     履歴の読み書き
+     ============================================================ */
+  function loadHistory(){
+    const raw = safeStorage.get(STORAGE_KEY);
+    if(!raw) return {};
+    try{
+      const parsed = JSON.parse(raw);
+      return (parsed && typeof parsed === "object") ? parsed : {};
+    }catch(e){
+      return {};
+    }
+  }
+
+  function saveHistory(historyObj){
+    // 直近7日分だけ残して古いデータを削除
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - (MAX_HISTORY_DAYS - 1));
+    cutoff.setHours(0,0,0,0);
+
+    const trimmed = {};
+    Object.keys(historyObj).forEach(key => {
+      const parts = key.split("-").map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      if(d >= cutoff){
+        trimmed[key] = historyObj[key];
+      }
+    });
+
+    safeStorage.set(STORAGE_KEY, JSON.stringify(trimmed));
+    return trimmed;
+  }
+
+  function recordTodayResult(count, colorKey){
+    let history = loadHistory();
+    const todayKey = getTodayKey();
+    // 同じ日はデータを上書き（履歴を増やさない）
+    history[todayKey] = { count: count, color: colorKey };
+    history = saveHistory(history);
+    return history;
+  }
+
+  /* ============================================================
+     過去7日間の表示用データを作成
+     ============================================================ */
+  function buildLast7Days(history){
+    const days = [];
+    const todayKey = getTodayKey();
+    for(let i = MAX_HISTORY_DAYS - 1; i >= 0; i--){
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = formatDateKey(d);
+      const label = formatDateLabel(d);
+      const record = history[key] || null; // 記録がなければnull（前日の値を引き継がない）
+      days.push({ key, label, record, isToday: key === todayKey });
+    }
+    return days;
+  }
+
+  function renderHistory(history){
+    const row = document.getElementById("historyRow");
+    const days = buildLast7Days(history);
+
+    let html = "";
+    days.forEach(day => {
+      let valueHtml = "―";
+      let itemClass = "history-item";
+      if(day.isToday) itemClass += " today";
+
+      if(day.record){
+        const level = JUDGE_LEVELS[day.record.color];
+        const emoji = level ? level.emoji : "";
+        valueHtml = `${emoji} ${day.record.count}`;
+      }
+
+      html += `
+        <div class="${itemClass}">
+          <div class="d">${day.label}</div>
+          <div class="v">${valueHtml}</div>
+        </div>
+      `;
+    });
+
+    row.innerHTML = html;
+    renderStreakMessage(days);
+  }
+
+  /* ============================================================
+     連続アラートの補助メッセージ
+     直近2日（今日と昨日）の状態を見て、責めない表現でメッセージ表示
+     ============================================================ */
+  function renderStreakMessage(days){
+    const box = document.getElementById("streakMsg");
+    // days は7日分（末尾が今日）。直近2日を取得
+    const last2 = days.slice(-2);
+    const [dayBefore, today] = last2;
+
+    let message = "";
+
+    const hasNoRecord = (d) => !d.record;
+    const isColor = (d, color) => d.record && d.record.color === color;
+
+    if(hasNoRecord(dayBefore) && hasNoRecord(today)){
+      message = "🍃 チェックする余裕もなくなってない？";
+    } else if(isColor(dayBefore, "red") && isColor(today, "red")){
+      message = "🛠️ 合宿が長期化しています。生活メンテナンスDAY推奨！";
+    } else if(
+      (isColor(dayBefore, "yellow") || isColor(dayBefore, "red")) &&
+      (isColor(today, "yellow") || isColor(today, "red"))
+    ){
+      message = "🌤️ 生活アラートが続いています。今日は少し余白を作ろう。";
+    } else if(isColor(dayBefore, "green") && isColor(today, "green")){
+      message = "✨ 安定しています。この調子！";
+    }
+
+    if(message){
+      box.textContent = message;
+      box.style.display = "block";
+    }else{
+      box.style.display = "none";
+    }
+  }
+
+  /* ============================================================
+     診断結果の表示
+     ============================================================ */
+  function renderResult(count, level){
+    const card = document.getElementById("resultCard");
+    const countEl = document.getElementById("resultCount");
+    const titleEl = document.getElementById("resultTitle");
+    const messageEl = document.getElementById("resultMessage");
+
+    card.classList.remove("result-green", "result-yellow", "result-red");
+    card.classList.add(`result-${level.color}`);
+    card.classList.add("show");
+
+    countEl.textContent = `アラート ${count} 件`;
+    titleEl.textContent = `${level.emoji} ${level.title}`;
+    messageEl.textContent = level.message;
+
+    // 結果カードまで滑らかにスクロール
+    setTimeout(() => {
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  }
+
+  /* ============================================================
+     イベントハンドラ
+     ============================================================ */
+  function handleDiagnose(){
+    try{
+      const count = countAlerts();
+      const level = judgeLevel(count);
+      renderResult(count, level);
+
+      const history = recordTodayResult(count, level.color);
+      renderHistory(history);
+    }catch(err){
+      // 何が起きても画面全体を止めない
+      console.error("診断処理でエラーが発生しました:", err);
+      alert("診断中に問題が発生しました。もう一度お試しください。");
+    }
+  }
+
+  function handleClearChecks(){
+    try{
+      CHECK_CATEGORIES.forEach(category => {
+        category.items.forEach(item => {
+          const el = document.getElementById(item.id);
+          if(el) el.checked = false;
+        });
+      });
+    }catch(err){
+      console.error("チェッククリアでエラーが発生しました:", err);
+    }
+  }
+
+  function handleResetHistory(){
+    const confirmed = window.confirm("履歴をすべて削除します。よろしいですか？");
+    if(!confirmed) return;
+    try{
+      safeStorage.remove(STORAGE_KEY);
+      renderHistory({});
+    }catch(err){
+      console.error("履歴削除でエラーが発生しました:", err);
+    }
+  }
+
+  /* ============================================================
+     初期化
+     ============================================================ */
+  function init(){
+    renderChecklist();
+
+    if(!safeStorage.isAvailable){
+      const warn = document.getElementById("storageWarning");
+      warn.classList.add("show");
+    }
+
+    const history = loadHistory();
+    renderHistory(history);
+
+    document.getElementById("diagnoseBtn").addEventListener("click", handleDiagnose);
+    document.getElementById("clearChecksBtn").addEventListener("click", handleClearChecks);
+    document.getElementById("resetHistoryBtn").addEventListener("click", handleResetHistory);
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+
+})();
+</script>
+
+</body>
+</html>
