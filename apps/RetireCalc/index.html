@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<link rel="icon" href="RetireCalc-favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="RetireCalc-favicon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>退職金シミュレーター</title>
+<style>
+  :root {
+    --navy-900: #16233a;
+    --navy-700: #24344f;
+    --navy-500: #3a5170;
+    --steel-300: #b9c4d1;
+    --steel-100: #eef1f5;
+    --paper: #f7f8fa;
+    --accent: #2f6f5e;
+    --accent-dark: #245647;
+    --error: #b3261e;
+    --error-bg: #fdecea;
+    --white: #ffffff;
+    --radius: 6px;
+    --mono: "SFMono-Regular", "Consolas", "Menlo", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    color: var(--navy-900);
+    line-height: 1.6;
+    padding: 24px 16px 60px;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 24px;
+    border-bottom: 3px solid var(--navy-900);
+    padding-bottom: 16px;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  header h1 {
+    margin: 0 0 6px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--navy-900);
+    letter-spacing: 0.02em;
+  }
+
+  header p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--navy-500);
+  }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--steel-300);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--navy-500);
+    letter-spacing: 0.08em;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    margin-bottom: 6px;
+  }
+
+  input[type="date"],
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 1px solid var(--steel-300);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--navy-900);
+    font-family: inherit;
+  }
+
+  input[type="text"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(47, 111, 94, 0.15);
+  }
+
+  .hint {
+    font-size: 0.78rem;
+    color: var(--navy-500);
+    margin-top: 4px;
+  }
+
+  .btn-row {
+    margin-top: 4px;
+  }
+
+  button {
+    font-family: inherit;
+  }
+
+  button.calc-btn,
+  button.primary-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s ease;
+  }
+
+  button.calc-btn:hover,
+  button.primary-btn:hover {
+    background: var(--accent-dark);
+  }
+
+  button.calc-btn:active,
+  button.primary-btn:active {
+    transform: translateY(1px);
+  }
+
+  .settings-btn,
+  .secondary-btn,
+  .danger-btn {
+    border: 1px solid var(--steel-300);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--navy-700);
+    padding: 9px 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .settings-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .settings-btn:hover,
+  .secondary-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent-dark);
+  }
+
+  .danger-btn {
+    color: var(--error);
+    padding: 7px 10px;
+  }
+
+  .view[hidden] {
+    display: none;
+  }
+
+  .settings-description {
+    margin: 0 0 16px;
+    color: var(--navy-500);
+    font-size: 0.85rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--steel-300);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+
+  .factor-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 440px;
+  }
+
+  .factor-table th,
+  .factor-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--steel-100);
+    text-align: left;
+  }
+
+  .factor-table th {
+    background: var(--steel-100);
+    color: var(--navy-700);
+    font-size: 0.8rem;
+  }
+
+  .factor-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .factor-table input[type="number"] {
+    width: 100%;
+    min-width: 86px;
+    padding: 8px 9px;
+    border: 1px solid var(--steel-300);
+    border-radius: var(--radius);
+    color: var(--navy-900);
+    font: 0.95rem var(--mono);
+  }
+
+  .settings-actions,
+  .transfer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .settings-actions {
+    margin-top: 16px;
+  }
+
+  .settings-actions .primary-btn {
+    flex: 1 1 180px;
+  }
+
+  .settings-actions .secondary-btn {
+    flex: 0 1 auto;
+  }
+
+  .transfer-actions {
+    margin-top: 12px;
+  }
+
+  .status-box {
+    display: none;
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .status-box.show {
+    display: block;
+  }
+
+  .status-box.error {
+    color: var(--error);
+    background: var(--error-bg);
+    border: 1px solid var(--error);
+  }
+
+  .status-box.success {
+    color: var(--accent-dark);
+    background: #e8f3ef;
+    border: 1px solid var(--accent);
+  }
+
+  .file-input {
+    display: none;
+  }
+
+  .error-box {
+    display: none;
+    background: var(--error-bg);
+    border: 1px solid var(--error);
+    color: var(--error);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .error-box.show {
+    display: block;
+  }
+
+  .result-card {
+    display: none;
+  }
+
+  .result-card.show {
+    display: block;
+  }
+
+  .result-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed var(--steel-300);
+  }
+
+  .result-row .r-label {
+    font-size: 0.76rem;
+    color: var(--navy-500);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .result-row .r-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--navy-900);
+    font-family: var(--mono);
+  }
+
+  .result-main {
+    text-align: center;
+    padding: 8px 0 4px;
+  }
+
+  .result-main .r-label {
+    font-size: 0.8rem;
+    color: var(--navy-500);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .result-main .r-amount {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--accent-dark);
+    font-family: var(--mono);
+    line-height: 1.2;
+  }
+
+  .result-main .r-amount span.unit {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-left: 2px;
+  }
+
+  .result-main .r-sub {
+    margin-top: 6px;
+    font-size: 1rem;
+    color: var(--navy-700);
+    font-family: var(--mono);
+  }
+
+  .notice {
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: var(--steel-100);
+    border-left: 4px solid var(--navy-500);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--navy-700);
+    white-space: pre-line;
+  }
+
+  @media (max-width: 420px) {
+    .header-row {
+      display: block;
+    }
+    .settings-btn {
+      margin-top: 12px;
+      width: 100%;
+    }
+    .result-rows {
+      grid-template-columns: 1fr 1fr;
+    }
+    .result-main .r-amount {
+      font-size: 1.7rem;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-row">
+      <div>
+        <h1>退職金シミュレーター</h1>
+        <p>登録した支給率を使って退職金の概算額を計算します。</p>
+      </div>
+      <button type="button" class="settings-btn" id="openSettingsBtn">⚙ 支給率設定</button>
+    </div>
+  </header>
+
+  <main class="view" id="simulatorView">
+  <div class="card">
+    <p class="card-title">入力</p>
+
+    <div class="field">
+      <label for="hireDate">正社員になった日</label>
+      <input type="date" id="hireDate">
+    </div>
+
+    <div class="field">
+      <label for="baseDate">計算基準日</label>
+      <input type="date" id="baseDate">
+    </div>
+
+    <div class="field">
+      <label for="baseSalary">基本給（円）</label>
+      <input type="text" id="baseSalary" inputmode="numeric" placeholder="例：250,000 または 250000">
+      <div class="hint">カンマ有り・無し、どちらの入力も可能です。</div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="calc-btn" id="calcBtn">計算する</button>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="card result-card" id="resultCard">
+    <p class="card-title">計算結果</p>
+
+    <div class="result-rows">
+      <div class="result-row">
+        <div class="r-label">勤続年数</div>
+        <div class="r-value" id="rYears">-</div>
+      </div>
+      <div class="result-row">
+        <div class="r-label">係数1</div>
+        <div class="r-value" id="rFactor1">-</div>
+      </div>
+      <div class="result-row">
+        <div class="r-label">係数2</div>
+        <div class="r-value" id="rFactor2">-</div>
+      </div>
+      <div class="result-row">
+        <div class="r-label">基本給</div>
+        <div class="r-value" id="rSalary">-</div>
+      </div>
+    </div>
+
+    <div class="result-main">
+      <div class="r-label">退職金見込額</div>
+      <div class="r-amount"><span id="rAmount">-</span><span class="unit">円</span></div>
+      <div class="r-sub" id="rAmountManYen">-</div>
+    </div>
+  </div>
+
+  <div class="notice">※本シミュレーターは概算計算です。
+正式な退職金額は就業規則および会社の規定に基づいて算出されます。</div>
+  </main>
+
+  <main class="view" id="settingsView" hidden>
+    <div class="card">
+      <p class="card-title">支給率設定</p>
+      <p class="settings-description">会社の規定に合わせて勤続年数ごとの係数を登録してください。設定はこの端末のブラウザ内に保存されます。</p>
+
+      <div class="status-box" id="settingsStatus" role="alert"></div>
+
+      <div class="table-wrap">
+        <table class="factor-table">
+          <thead>
+            <tr>
+              <th>勤続年数</th>
+              <th>係数1</th>
+              <th>係数2</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="factorTableBody"></tbody>
+        </table>
+      </div>
+
+      <button type="button" class="secondary-btn" id="addRowBtn">＋ 行を追加</button>
+
+      <div class="settings-actions">
+        <button type="button" class="primary-btn" id="saveSettingsBtn">保存</button>
+        <button type="button" class="secondary-btn" id="cancelSettingsBtn">キャンセル</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="card-title">設定の移行</p>
+      <p class="settings-description">JSONファイルを使って、別のPCやスマートフォンへ支給率設定を移せます。</p>
+      <div class="transfer-actions">
+        <button type="button" class="secondary-btn" id="exportBtn">JSONをエクスポート</button>
+        <button type="button" class="secondary-btn" id="importBtn">JSONをインポート</button>
+        <input type="file" class="file-input" id="importFile" accept=".json,application/json">
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  'use strict';
+
+  const STORAGE_KEY = 'retirement-factor-table';
+
+  /*
+   * 初回設定画面にだけ使う入力例。
+   * 保存後の計算ではこの値を参照せず、必ずLocalStorageのデータを使用する。
+   */
+  const DEFAULT_RETIREMENT_FACTORS = [
+    { years: 4, factor1: 4.0, factor2: 0.8 },
+    { years: 5, factor1: 5.2, factor2: 0.8 },
+    { years: 6, factor1: 6.4, factor2: 0.8 },
+    { years: 7, factor1: 7.6, factor2: 0.8 },
+    { years: 8, factor1: 8.8, factor2: 0.8 },
+    { years: 9, factor1: 10.0, factor2: 0.8 },
+    { years: 10, factor1: 11.6, factor2: 0.8 },
+    { years: 11, factor1: 12.8, factor2: 1.0 },
+    { years: 12, factor1: 14.0, factor2: 1.0 },
+    { years: 13, factor1: 15.2, factor2: 1.0 },
+    { years: 14, factor1: 16.4, factor2: 1.0 },
+    { years: 15, factor1: 17.6, factor2: 1.0 },
+    { years: 16, factor1: 18.8, factor2: 1.0 },
+    { years: 17, factor1: 20.0, factor2: 1.0 },
+    { years: 18, factor1: 21.2, factor2: 1.0 },
+    { years: 19, factor1: 22.4, factor2: 1.0 },
+    { years: 20, factor1: 23.6, factor2: 1.0 },
+    { years: 21, factor1: 24.8, factor2: 1.0 },
+    { years: 22, factor1: 26.0, factor2: 1.0 },
+    { years: 23, factor1: 27.2, factor2: 1.0 },
+    { years: 24, factor1: 28.4, factor2: 1.0 },
+    { years: 25, factor1: 29.6, factor2: 1.0 },
+    { years: 26, factor1: 30.8, factor2: 1.0 },
+    { years: 27, factor1: 32.0, factor2: 1.0 },
+    { years: 28, factor1: 33.2, factor2: 1.0 },
+    { years: 29, factor1: 34.4, factor2: 1.0 },
+    { years: 30, factor1: 35.6, factor2: 1.0 },
+    { years: 31, factor1: 36.8, factor2: 1.0 },
+    { years: 32, factor1: 38.0, factor2: 1.0 },
+    { years: 33, factor1: 39.2, factor2: 1.0 },
+    { years: 34, factor1: 40.4, factor2: 1.0 },
+    { years: 35, factor1: 41.6, factor2: 1.0 },
+    { years: 36, factor1: 42.8, factor2: 1.0 },
+    { years: 37, factor1: 44.0, factor2: 1.0 },
+    { years: 38, factor1: 45.2, factor2: 1.0 },
+    { years: 39, factor1: 46.4, factor2: 1.0 },
+    { years: 40, factor1: 47.6, factor2: 1.0 },
+    { years: 41, factor1: 48.8, factor2: 1.0 },
+    { years: 42, factor1: 50.0, factor2: 1.0 },
+    { years: 43, factor1: 51.2, factor2: 1.0 },
+    { years: 44, factor1: 52.4, factor2: 1.0 },
+    { years: 45, factor1: 53.6, factor2: 1.0 }
+  ];
+
+  const simulatorView = document.getElementById('simulatorView');
+  const settingsView = document.getElementById('settingsView');
+  const openSettingsBtn = document.getElementById('openSettingsBtn');
+  const settingsStatus = document.getElementById('settingsStatus');
+  const factorTableBody = document.getElementById('factorTableBody');
+  const addRowBtn = document.getElementById('addRowBtn');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const importBtn = document.getElementById('importBtn');
+  const importFile = document.getElementById('importFile');
+  const hireDateInput = document.getElementById('hireDate');
+  const baseDateInput = document.getElementById('baseDate');
+  const baseSalaryInput = document.getElementById('baseSalary');
+  const calcBtn = document.getElementById('calcBtn');
+  const errorBox = document.getElementById('errorBox');
+  const resultCard = document.getElementById('resultCard');
+
+  const rYears = document.getElementById('rYears');
+  const rFactor1 = document.getElementById('rFactor1');
+  const rFactor2 = document.getElementById('rFactor2');
+  const rSalary = document.getElementById('rSalary');
+  const rAmount = document.getElementById('rAmount');
+  const rAmountManYen = document.getElementById('rAmountManYen');
+
+  function showError(message) {
+    errorBox.textContent = message;
+    errorBox.classList.add('show');
+    resultCard.classList.remove('show');
+  }
+
+  function clearError() {
+    errorBox.textContent = '';
+    errorBox.classList.remove('show');
+  }
+
+  function formatYen(n) {
+    return n.toLocaleString('ja-JP');
+  }
+
+  /*
+   * 支給率データの取得窓口。
+   * 将来クラウド同期やCSV読込へ移行する場合は、この関数の取得元を差し替える。
+   */
+  function getRetirementFactors() {
+    const json = localStorage.getItem(STORAGE_KEY);
+    if (!json) return null;
+
+    try {
+      const factors = JSON.parse(json);
+      return Array.isArray(factors) ? factors : null;
+    } catch (error) {
+      console.error('支給率データの読み込みに失敗しました。', error);
+      return null;
+    }
+  }
+
+  // 保存処理も一か所に集約し、データの保存先を計算ロジックから分離する。
+  function saveRetirementFactors(factors) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(factors));
+  }
+
+  function showSettingsStatus(message, type = 'error') {
+    settingsStatus.textContent = message;
+    settingsStatus.className = 'status-box show ' + type;
+  }
+
+  function clearSettingsStatus() {
+    settingsStatus.textContent = '';
+    settingsStatus.className = 'status-box';
+  }
+
+  function createFactorRow(factor = { years: '', factor1: '', factor2: '' }) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="number" class="factor-years" min="0" step="1" value="${escapeAttribute(factor.years)}" aria-label="勤続年数"></td>
+      <td><input type="number" class="factor-one" step="any" value="${escapeAttribute(factor.factor1)}" aria-label="係数1"></td>
+      <td><input type="number" class="factor-two" step="any" value="${escapeAttribute(factor.factor2)}" aria-label="係数2"></td>
+      <td><button type="button" class="danger-btn remove-row-btn">削除</button></td>
+    `;
+    row.querySelector('.remove-row-btn').addEventListener('click', () => row.remove());
+    factorTableBody.appendChild(row);
+  }
+
+  function escapeAttribute(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function renderFactorTable(factors) {
+    factorTableBody.innerHTML = '';
+    factors.forEach(createFactorRow);
+  }
+
+  function openSettings(isInitialSetup = false) {
+    const savedFactors = getRetirementFactors();
+    const factors = savedFactors || DEFAULT_RETIREMENT_FACTORS;
+
+    renderFactorTable(factors);
+    clearSettingsStatus();
+    simulatorView.hidden = true;
+    settingsView.hidden = false;
+    openSettingsBtn.hidden = true;
+    cancelSettingsBtn.hidden = isInitialSetup;
+  }
+
+  function closeSettings() {
+    settingsView.hidden = true;
+    simulatorView.hidden = false;
+    openSettingsBtn.hidden = false;
+    clearSettingsStatus();
+  }
+
+  function readFactorsFromTable() {
+    return Array.from(factorTableBody.querySelectorAll('tr')).map(row => ({
+      years: Number(row.querySelector('.factor-years').value),
+      factor1: Number(row.querySelector('.factor-one').value),
+      factor2: Number(row.querySelector('.factor-two').value)
+    }));
+  }
+
+  function validateFactors(factors) {
+    if (factors.length === 0) {
+      return '支給率を1行以上登録してください。';
+    }
+
+    const rows = Array.from(factorTableBody.querySelectorAll('tr'));
+    for (let index = 0; index < rows.length; index += 1) {
+      const inputs = rows[index].querySelectorAll('input');
+      if (Array.from(inputs).some(input => input.value.trim() === '')) {
+        return `${index + 1}行目に未入力の項目があります。`;
+      }
+      if (!Number.isInteger(factors[index].years) || factors[index].years < 0) {
+        return `${index + 1}行目の勤続年数は0以上の整数で入力してください。`;
+      }
+      if (!Number.isFinite(factors[index].factor1) || !Number.isFinite(factors[index].factor2)) {
+        return `${index + 1}行目の係数は数値で入力してください。`;
+      }
+    }
+
+    const years = factors.map(factor => factor.years);
+    if (new Set(years).size !== years.length) {
+      return '勤続年数が重複しています。重複しない値を入力してください。';
+    }
+
+    for (let index = 1; index < years.length; index += 1) {
+      if (years[index] <= years[index - 1]) {
+        return '勤続年数は上から昇順になるように入力してください。';
+      }
+    }
+
+    return '';
+  }
+
+  function saveSettings() {
+    clearSettingsStatus();
+    const factors = readFactorsFromTable();
+    const validationError = validateFactors(factors);
+
+    if (validationError) {
+      showSettingsStatus(validationError);
+      return;
+    }
+
+    try {
+      saveRetirementFactors(factors);
+      closeSettings();
+    } catch (error) {
+      console.error('支給率データの保存に失敗しました。', error);
+      showSettingsStatus('支給率を保存できませんでした。ブラウザの保存設定をご確認ください。');
+    }
+  }
+
+  function exportFactors() {
+    const factors = getRetirementFactors();
+    if (!factors) {
+      showSettingsStatus('先に支給率を保存してください。');
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify(factors, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'retirement-factor-table.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showSettingsStatus('支給率設定をエクスポートしました。', 'success');
+  }
+
+  function importFactors(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(reader.result);
+        if (!Array.isArray(imported)) {
+          throw new Error('JSONの形式が正しくありません。');
+        }
+
+        renderFactorTable(imported);
+        const factors = readFactorsFromTable();
+        const validationError = validateFactors(factors);
+        if (validationError) {
+          showSettingsStatus('インポートできません：' + validationError);
+          return;
+        }
+
+        saveRetirementFactors(factors);
+        renderFactorTable(factors);
+        showSettingsStatus('支給率設定をインポートし、保存しました。', 'success');
+      } catch (error) {
+        console.error('支給率データのインポートに失敗しました。', error);
+        showSettingsStatus('JSONを読み込めませんでした。ファイルの内容をご確認ください。');
+      } finally {
+        importFile.value = '';
+      }
+    };
+    reader.onerror = () => {
+      showSettingsStatus('ファイルを読み込めませんでした。');
+      importFile.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  // 満年数（勤続年数）を計算する。月数は切り捨て。
+  function calcFullYears(hireDate, baseDate) {
+    let years = baseDate.getFullYear() - hireDate.getFullYear();
+    const hasHadAnniversaryThisYear =
+      (baseDate.getMonth() > hireDate.getMonth()) ||
+      (baseDate.getMonth() === hireDate.getMonth() && baseDate.getDate() >= hireDate.getDate());
+    if (!hasHadAnniversaryThisYear) {
+      years -= 1;
+    }
+    return years;
+  }
+
+  function getFactorForYears(years) {
+    const factors = getRetirementFactors();
+    return factors ? factors.find(factor => factor.years === years) || null : null;
+  }
+
+  function calculate() {
+    clearError();
+    resultCard.classList.remove('show');
+
+    const hireDateStr = hireDateInput.value;
+    const baseDateStr = baseDateInput.value;
+    const salaryRaw = baseSalaryInput.value;
+
+    if (!hireDateStr) {
+      showError('正社員になった日を入力してください。');
+      return;
+    }
+    if (!baseDateStr) {
+      showError('計算基準日を入力してください。');
+      return;
+    }
+    if (!salaryRaw || salaryRaw.trim() === '') {
+      showError('基本給を入力してください。');
+      return;
+    }
+
+    const salaryNumeric = salaryRaw.replace(/,/g, '').trim();
+    const baseSalary = Number(salaryNumeric);
+
+    if (!/^[0-9]+$/.test(salaryNumeric) || isNaN(baseSalary) || baseSalary <= 0) {
+      showError('基本給は数値で入力してください（例：250,000 または 250000）。');
+      return;
+    }
+
+    const hireDate = new Date(hireDateStr + 'T00:00:00');
+    const baseDate = new Date(baseDateStr + 'T00:00:00');
+
+    if (baseDate < hireDate) {
+      showError('計算基準日は正社員になった日以降を指定してください。');
+      return;
+    }
+
+    let years = calcFullYears(hireDate, baseDate);
+
+    const factors = getRetirementFactors();
+    if (!factors || factors.length === 0) {
+      showError('支給率が設定されていません。右上の「支給率設定」から登録してください。');
+      return;
+    }
+
+    const minimumYears = factors[0].years;
+    const maximumYears = factors[factors.length - 1].years;
+
+    // 従来仕様と同様に、最大勤続年数を超えた場合は最終行の係数を使用する。
+    if (years > maximumYears) {
+      years = maximumYears;
+    }
+
+    if (years < minimumYears) {
+      showError(`勤続${minimumYears}年以上から係数が設定されています。`);
+      return;
+    }
+
+    const factorEntry = getFactorForYears(years);
+    if (!factorEntry) {
+      showError('該当する係数が見つかりませんでした。');
+      return;
+    }
+
+    const amountRaw = baseSalary * factorEntry.factor1 * factorEntry.factor2;
+    const amount = Math.floor(amountRaw);
+    const manYen = amount / 10000;
+
+    rYears.textContent = years + '年';
+    rFactor1.textContent = factorEntry.factor1.toFixed(1);
+    rFactor2.textContent = factorEntry.factor2.toFixed(1);
+    rSalary.textContent = formatYen(baseSalary) + '円';
+    rAmount.textContent = formatYen(amount);
+    rAmountManYen.textContent = '（約' + manYen.toFixed(1) + '万円）';
+
+    resultCard.classList.add('show');
+  }
+
+  calcBtn.addEventListener('click', calculate);
+  openSettingsBtn.addEventListener('click', () => openSettings(false));
+  cancelSettingsBtn.addEventListener('click', closeSettings);
+  addRowBtn.addEventListener('click', () => createFactorRow());
+  saveSettingsBtn.addEventListener('click', saveSettings);
+  exportBtn.addEventListener('click', exportFactors);
+  importBtn.addEventListener('click', () => importFile.click());
+  importFile.addEventListener('change', () => {
+    if (importFile.files[0]) importFactors(importFile.files[0]);
+  });
+
+  // 初回のみ設定画面を表示し、保存済みなら通常画面から開始する。
+  if (getRetirementFactors()) {
+    closeSettings();
+  } else {
+    openSettings(true);
+  }
+</script>
+
+</body>
+</html>
